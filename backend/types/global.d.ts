@@ -21,6 +21,14 @@ declare global {
         email: string
     }
 
+    interface Product {
+        name: string,
+        price: number,
+        discountedPrice?: number,
+        unitOfMeasure: string,
+        storeName: string
+    }
+
     const enum ResponseCode {
         /** The request was successfully completed. */
         Ok = 200,

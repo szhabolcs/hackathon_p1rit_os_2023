@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
 import ScrapeService from "../services/ScrapeService.js";
 
-function carrefour(req: Request, res: Response) {
+async function carrefour(req: Request, res: Response) {
   try {
-    ScrapeService.carrefour();
+    await ScrapeService.carrefour();
     res.sendStatus(ResponseCode.Ok);
   } catch (error) {
     console.log(error);

@@ -18,6 +18,8 @@ async function register(req: Request, res: Response) {
 
 async function login(req: Request, res: Response) {
     const { email, password } = req.body;
+
+    console.log(req.body);
     
     try {
         const tokens = await AuthService.login({ email, password });

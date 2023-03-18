@@ -110,7 +110,6 @@ async function lidl() {
       }
     });
 
-    console.log(links);
   } catch (error) {
     console.log(error);
   }

@@ -11,4 +11,24 @@ async function carrefour(req: Request, res: Response) {
   }
 }
 
-export { carrefour };
+async function kaufland(req: Request, res: Response) {
+  try {
+    await ScrapeService.kaufland();
+    res.sendStatus(ResponseCode.Ok);
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(ResponseCode.BadRequest);
+  }
+}
+
+async function lidl(req: Request, res: Response) {
+  try {
+    await ScrapeService.lidl();
+    res.sendStatus(ResponseCode.Ok);
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(ResponseCode.BadRequest);
+  }
+}
+
+export { carrefour, kaufland, lidl };

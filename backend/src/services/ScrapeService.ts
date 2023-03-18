@@ -17,7 +17,7 @@ const browser = await puppeteer.launch({
  - show data on console
  - send data to database
  **/
-async function carrefour() {}
+async function carrefour() { }
 
 async function kaufland() {
   const page = await browser.newPage();
@@ -114,7 +114,6 @@ async function lidl() {
       }
     });
 
-    console.log(links);
   } catch (error) {
     console.log(error);
   }
@@ -129,34 +128,26 @@ async function doOneCategory(link: string) {
 
     return Array.from(products).map((product) => {
       const nameElement = product.querySelector("h3.ret-o-card__headline");
-      const priceElement = product.querySelector(
-        ".lidl-m-pricebox__discount-price"
-      );
+      const priceElement = product.querySelector(".lidl-m-pricebox__discount-price");
       const discountElement = product.querySelector(".lidl-m-pricebox__price");
-      //   const discountPercantage = product.querySelector(
-      //     ".lidl-m-pricebox__highlight"
-      //   );
-      const quantityElement = product.querySelector(
-        ".lidl-m-pricebox__basic-quantity"
-      );
-      const image = product
-        // .querySelector(".nuc-m-picture__image")
-        .querySelector(".nuc-a-source")
-        ?.getAttribute("srcset"); // optional chaining here
+
+      const quantityElement = product.querySelector(".lidl-m-pricebox__basic-quantity");
+      const image = product.querySelector(".nuc-a-source")?.getAttribute("srcset")?.split(" ")[0]; // optional chaining here
 
       const name = nameElement?.textContent?.trim();
       let price = Number.parseFloat(
         priceElement?.textContent?.trim().replace(",", ".") ?? ""
       );
-      let discountedPrice: number | null = Number.parseFloat(
+      let discountedPrice = Number.parseFloat(
         discountElement?.textContent?.trim().replace(",", ".") ?? ""
       );
       const unitOfMeasure = quantityElement?.textContent?.trim();
       const storeName = "Lidl";
 
-      // database bug - price cannot be null
-      if (price === null && discountedPrice !== null) {
+      if (isNaN(price) && discountedPrice !== null) {
         price = discountedPrice;
+        // @ts-ignore
+        discountedPrice = null;
       }
 
       return {

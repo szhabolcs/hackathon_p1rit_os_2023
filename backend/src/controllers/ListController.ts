@@ -6,9 +6,9 @@ async function query(req: Request, res: Response) {
     const list: string[] = req.body.list;
 
     try {
-        const lists = ListService.query(list);
+        const _list = await ListService.query(list);
 
-        res.status(ResponseCode.Ok).json(lists);
+        res.status(ResponseCode.Ok).json(_list);
 
     } catch (error) {
         console.log(error);

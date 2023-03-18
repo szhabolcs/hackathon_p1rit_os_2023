@@ -4,6 +4,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["fullTextSearch", "fullTextIndex"]
 }
 
 datasource db {
@@ -26,4 +27,6 @@ model Product {
   unitOfMeasure   String
   image           String
   storeName       String
+
+  @@fulltext([name])
 }

@@ -5,6 +5,7 @@ import "express-async-errors";
 
 import { auth } from "./routes/auth.js";
 import { scrape } from "./routes/scrape.js";
+import { authorizeJWT } from "./middleware/jwt-authorize.js";
 
 env.config({ path: ".env" });
 
@@ -17,12 +18,16 @@ app.use(
   })
 );
 
+app.use(express.json());
+
 app.use("/auth", auth);
 app.use("/scrape", scrape);
 
 app.get("/", (_, res) => {
   res.json("");
 });
+
+app.get("/jwt-test", authorizeJWT, (req, res) => res.json("OK!"));
 
 app.listen(process.env.API_PORT, () => {
   console.log(

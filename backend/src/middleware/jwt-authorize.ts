@@ -1,27 +1,30 @@
 import { NextFunction, Request, Response } from 'express';
-import { tokenCache } from "../services/AuthService.js"
+import AuthService from "../services/AuthService.js"
 import jwt from 'jsonwebtoken';
 
 export function authorizeJWT(req: Request, res: Response, next: NextFunction) {
-    const { token } = req.cookies;
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
 
     if (typeof token !== "undefined") {
         jwt.verify(token, process.env.JWT_SECRET, (err: any, data: any) => {
             if (err) {
-                // throw new APIError(ResponseCode.Forbidden, ErrorCode.JWTExpired);
+                res.sendStatus(ResponseCode.Forbidden);
             }
-            else if (tokenCache.has(token) === false) {
-                // throw new APIError(ResponseCode.Forbidden, ErrorCode.JWTExpired);
+            else if (
+                AuthService.tokenCache.has(token) === false
+                && AuthService.refreshTokenCache.has(token) === false) {
+                res.sendStatus(ResponseCode.Forbidden);
             }
             else if (typeof data === 'undefined' || typeof data === 'string') {
-                // throw new APIError(ResponseCode.Forbidden, ErrorCode.JWTExpired);
+                res.sendStatus(ResponseCode.Forbidden);
             }
             else {
-                // req.user = data.user;
+                req.user = data.user;
                 next();
             }
         });
     } else{
-        // throw new APIError(ResponseCode.Forbidden, ErrorCode.JWTExpired);
+        res.sendStatus(ResponseCode.Forbidden);
     }
 }

@@ -26,45 +26,43 @@ async function lidl() {
   // Open page
   const page = await browser.newPage();
 
-  await page.goto(
-    "https://www.lidl.ro/c/ofertele-saptamanale-lidl-plus/c5201/w1"
-  );
+  // document.querySelectorAll("a.theme__item").forEach((link) => console.log("https://lidl.ro" + link.getAttribute("href")))
+  
+  try {
+    doOneCategory(page, "");
+    
+  } catch (error) {
+    console.log(error);
+  }
+  
+}
+
+async function doOneCategory(page: puppeteer.Page, link: string) {
+  await page.goto(link);
 
   await page.click(".cookie-alert-extended-button");
 
-  const products: Product[] = await page.evaluate(() => {
+  const products = await page.evaluate(() => {
     const products = document.querySelectorAll(".ret-o-card");
 
     return Array.from(products).map((product) => {
       const nameElement = product.querySelector("h3.ret-o-card__headline");
-      const priceElement = product.querySelector(
-        ".lidl-m-pricebox__discount-price"
-      );
-      const discountElement = product.querySelector(".lidl-m-pricebox__price");
+      const discountElement = product.querySelector(".lidl-m-pricebox__discount-price");
+      const priceElement = product.querySelector(".lidl-m-pricebox__price");
       //   const discountPercantage = product.querySelector(
       //     ".lidl-m-pricebox__highlight"
       //   );
-      const quantityElement = product.querySelector(
-        ".lidl-m-pricebox__basic-quantity"
-      );
+      const quantityElement = product.querySelector(".lidl-m-pricebox__basic-quantity");
       const image = product
         // .querySelector(".nuc-m-picture__image")
         .querySelector(".nuc-a-source")
         ?.getAttribute("srcset"); // optional chaining here
 
       const name = nameElement?.textContent?.trim();
-      const price = priceElement?.textContent?.trim();
-      const discountedPrice = discountElement?.textContent?.trim();
+      const price = Number.parseFloat(priceElement?.textContent?.trim().replace(",",".") ?? "");
+      const discountedPrice = Number.parseFloat(discountElement?.textContent?.trim().replace(",",".") ?? "");
       const unitOfMeasure = quantityElement?.textContent?.trim();
       const storeName = "Lidl";
-
-      console.log({
-        name,
-        price,
-        discountedPrice,
-        unitOfMeasure,
-        image,
-      });
 
       return {
         name,
@@ -77,10 +75,10 @@ async function lidl() {
     });
   });
 
-  //   console.log(products);
-  const createMany = await prisma.product.createMany({
-    data: products,
+  await prisma.product.createMany({
+    data: products as Product[],
     skipDuplicates: true,
   });
 }
+
 export default { carrefour, kaufland, lidl };

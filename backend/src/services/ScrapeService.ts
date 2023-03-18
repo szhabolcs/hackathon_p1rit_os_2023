@@ -2,6 +2,7 @@ import puppeteer from "puppeteer";
 import { PrismaClient } from "@prisma/client";
 import env from "dotenv";
 import process from "process";
+const prisma = new PrismaClient();
 // Todo:
 /***
  - scrape carrefour website
@@ -31,10 +32,55 @@ async function lidl() {
 
   await page.click(".cookie-alert-extended-button");
 
-  const three = await page.evaluate(() => {
-    return 3;
+  const products: Product[] = await page.evaluate(() => {
+    const products = document.querySelectorAll(".ret-o-card");
+
+    return Array.from(products).map((product) => {
+      const nameElement = product.querySelector("h3.ret-o-card__headline");
+      const priceElement = product.querySelector(
+        ".lidl-m-pricebox__discount-price"
+      );
+      const discountElement = product.querySelector(".lidl-m-pricebox__price");
+      //   const discountPercantage = product.querySelector(
+      //     ".lidl-m-pricebox__highlight"
+      //   );
+      const quantityElement = product.querySelector(
+        ".lidl-m-pricebox__basic-quantity"
+      );
+      const image = product
+        // .querySelector(".nuc-m-picture__image")
+        .querySelector(".nuc-a-source")
+        ?.getAttribute("srcset"); // optional chaining here
+
+      const name = nameElement?.textContent?.trim();
+      const price = priceElement?.textContent?.trim();
+      const discountedPrice = discountElement?.textContent?.trim();
+      const unitOfMeasure = quantityElement?.textContent?.trim();
+      const storeName = "Lidl";
+
+      console.log({
+        name,
+        price,
+        discountedPrice,
+        unitOfMeasure,
+        image,
+      });
+
+      return {
+        name,
+        price,
+        discountedPrice,
+        unitOfMeasure,
+        image,
+        storeName,
+      };
+    });
   });
 
-  console.log(three);
+  //   console.log(products);
+  const createMany = await prisma.product.createMany({
+    data: products,
+    skipDuplicates: true,
+  });
 }
 export default { carrefour, kaufland, lidl };

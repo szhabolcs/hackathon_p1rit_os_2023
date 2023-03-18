@@ -2,13 +2,13 @@ import { Request, Response } from 'express';
 
 import AuthService from "../services/AuthService.js";
 
-function register(req: Request, res: Response) {
+async function register(req: Request, res: Response) {
     const { name, email, password } = req.body;
     
     try {
-        AuthService.register({ name, email, password });
+        const tokens = await AuthService.register({ name, email, password });
         
-        res.sendStatus(ResponseCode.Ok);
+        res.status(ResponseCode.Ok).json(tokens);
         
     } catch (error) {
         console.log(error);
@@ -16,19 +16,13 @@ function register(req: Request, res: Response) {
     }
 }
 
-function login(req: Request, res: Response) {
+async function login(req: Request, res: Response) {
     const { email, password } = req.body;
     
     try {
-        const token = AuthService.login({ email, password });
+        const tokens = await AuthService.login({ email, password });
         
-        res.cookie("token", token,{
-            secure: process.env.NODE_ENV !== "dev",
-            httpOnly: true,
-            maxAge: 3600000
-        });
-
-        res.status(ResponseCode.Ok);
+        res.status(ResponseCode.Ok).json(tokens);
     
     } catch (error) {
         console.log(error);
@@ -37,7 +31,27 @@ function login(req: Request, res: Response) {
 
 }
 
+async function refresh(req: Request, res: Response) {
+    const authHeader = req.headers['authorization'];
+    const refreshtoken = authHeader && authHeader.split(' ')[1];
+
+    if (typeof refreshtoken === "undefined"){
+        res.sendStatus(ResponseCode.BadRequest);
+        return;
+    }
+    
+    try {
+        const newTokens = await AuthService.refresh(req.user, refreshtoken);
+        res.status(ResponseCode.Ok).json(newTokens);
+    
+    } catch (error) {
+        console.log(error);
+        res.sendStatus(ResponseCode.Forbidden);
+    }
+}
+
 export default {
     register,
-    login
+    login,
+    refresh
 }

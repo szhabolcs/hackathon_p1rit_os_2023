@@ -10,17 +10,10 @@ async function userExists(email: string): Promise<boolean> {
   return userExists !== null;
 }
 
-async function getUser(email: string, passwordHash: string) {
+async function getUser(email: string) {
   const dbUser = await prisma.user.findFirstOrThrow({
     where: {
-      AND: [
-        {
-          email,
-        },
-        {
-          password: passwordHash,
-        },
-      ],
+      email,
     },
   });
   return dbUser;

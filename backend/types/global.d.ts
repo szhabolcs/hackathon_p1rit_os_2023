@@ -26,7 +26,8 @@ declare global {
         price: number,
         discountedPrice?: number,
         unitOfMeasure: string,
-        storeName: string
+        storeName: string,
+        image: string
     }
 
     const enum ResponseCode {

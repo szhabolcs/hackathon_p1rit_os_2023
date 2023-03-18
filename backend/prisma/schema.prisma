@@ -24,5 +24,6 @@ model Product {
   price           Float
   discountedPrice Float?
   unitOfMeasure   String
+  image           String
   storeName       String
 }

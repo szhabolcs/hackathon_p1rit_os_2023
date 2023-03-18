@@ -6,6 +6,7 @@ import "express-async-errors";
 import { auth } from "./routes/auth.js";
 import { scrape } from "./routes/scrape.js";
 import { authorizeJWT } from "./middleware/jwt-authorize.js";
+import { list } from "./routes/list.js";
 
 env.config({ path: ".env" });
 
@@ -22,6 +23,7 @@ app.use(express.json());
 
 app.use("/auth", auth);
 app.use("/scrape", scrape);
+app.use("/list", list);
 
 app.get("/", (_, res) => {
   res.json("");

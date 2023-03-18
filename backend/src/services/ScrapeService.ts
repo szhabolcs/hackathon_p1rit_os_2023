@@ -30,18 +30,15 @@ async function kaufland() {
 
   try {
     const links = await page.evaluate(() => {
-      const links = document.querySelectorAll("a.m-accordion__link");
-      return Array.from(links).map((link) => {
+      const sidemenu = document.querySelector("body > div.body__wrapper > main > div.content__separator > div > div > div.g-row.g-layout-overview > div.g-col.g-col-1");
+      const links = sidemenu?.querySelectorAll(".m-accordion__link");
+      return Array.from(links ?? []).map((link) => {
         // Get link
         const page = link.getAttribute("href");
         const baseUri = "https://www.kaufland.ro" + page;
         return baseUri;
       });
     });
-
-    console.log(
-      links.filter((link) => /^https:\/\/www\.kaufland\.ro\/oferte/.test(link))
-    );
 
     links.forEach(async (link) => {
       try {
@@ -70,10 +67,10 @@ async function doOneKategory(link: string) {
       const quantityElement = product.querySelector(".m-offer-tile__quantity");
       const image = product
         .querySelector(".a-image-responsive")
-        ?.getAttribute("data-src");
+        ?.getAttribute("data-src") ?? "";
 
       const name = prodElement?.textContent
-        ?.trim()
+        ?.trim() ?? ""
         .concat(" ")
         .concat(nameElement?.textContent?.trim() ?? "");
 
@@ -83,7 +80,7 @@ async function doOneKategory(link: string) {
       let discountedPrice = Number.parseFloat(
         discountElement?.textContent?.trim().replace(",", ".") ?? ""
       );
-      const unitOfMeasure = quantityElement?.textContent?.trim();
+      const unitOfMeasure = quantityElement?.textContent?.trim() ?? "";
       const storeName = "Kaufland";
 
       if (isNaN(price) && discountedPrice !== null) {
@@ -102,6 +99,7 @@ async function doOneKategory(link: string) {
       };
     });
   });
+
   await prisma.product.createMany({
     data: products as Product[],
     skipDuplicates: true,
@@ -169,7 +167,7 @@ async function doOneCategory(link: string) {
       let discountedPrice = Number.parseFloat(
         discountElement?.textContent?.trim().replace(",", ".") ?? ""
       );
-      const unitOfMeasure = quantityElement?.textContent?.trim();
+      const unitOfMeasure = quantityElement?.textContent?.trim() ?? "";
       const storeName = "Lidl";
 
       if (isNaN(price) && discountedPrice !== null) {

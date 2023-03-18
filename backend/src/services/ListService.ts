@@ -1,5 +1,6 @@
 function query(list: string[]) {
-    return [
+    //TODO: query and search data from DB
+    const ret = [
         {
             "Lidl": [
                 {
@@ -20,7 +21,9 @@ function query(list: string[]) {
                 }
             ]
         }
-    ];
+    ]
+    
+    return ret;
 }
 
 export default {

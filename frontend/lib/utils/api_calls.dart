@@ -7,19 +7,18 @@ import 'package:jwt_decode/jwt_decode.dart';
 import 'package:http/http.dart' as http;
 
 class ApiCalls {
-  final String url = "http://10.0.89.152:8080";
+  final String url = "http://130.61.177.244:8080";
 
   post(String endpoint, String? token, body) async {
     Map<String, String> header = {
       'content-type': 'application/json',
-      (token != null) ? 'Authentication': 'Bearer $token' : ""
+      // (token != null) ? 'Authentication: Bearer $token' : ""
     };
     final resp = await http.post(
       Uri.parse(url + endpoint),
       headers: header,
       body: body
     );
-    log(resp.toString());
     return resp;
   }
 
@@ -38,17 +37,14 @@ class ApiCalls {
       "email": email,
       "password": password
     };
-    log(body.toString());
     final resp = await post("/auth/login", null, json.encode(body));
-
-    if (resp.ok) {
+    if (json.decode(resp.body)['token'] != null) {
       const storage = FlutterSecureStorage();
 
-      storage.write(key: "token", value: resp.token);
-      storage.write(key: "refresh", value: resp.refresh);
-
-      final userData = Jwt.parseJwt(resp.token);
-      final UserModel user = UserModel(userData['id'], userData['name'], email);
+      storage.write(key: "token", value: json.decode(resp.body)['token']);
+      storage.write(key: "refresh", value: json.decode(resp.body)['refresh']);
+      final userData = Jwt.parseJwt(json.decode(resp.body)['token']);
+      final UserModel user = UserModel(userData['user']['id'], userData['user']['name'], email);
       UserService().storeUser(user);
       return true;
     } else {

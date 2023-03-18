@@ -1,7 +1,9 @@
+import 'dart:developer';
+
 import 'package:frontend/models/user_model.dart';
 
 class UserService {
-  late UserModel _user;
+  static late UserModel _user;
 
   storeUser(UserModel user) {
     _user = user;

@@ -27,9 +27,12 @@ async function kaufland() {
   );
 
   await page.click(".cookie-alert-extended-button");
+  // console.log(await page.evaluate(() => document.documentElement.outerHTML));
+  // return;
+  // await page.waitForTimeout(5000);
 
   const products = await page.evaluate(() => {
-    const products = document.querySelectorAll(".o-slider-to-grid__tile");
+    const products = document.querySelectorAll(".m-offer-tile");
     return Array.from(products).map((product) => {
       //
       const nameElement = product.querySelector(".m-offer-tile__title");
@@ -40,7 +43,7 @@ async function kaufland() {
       const quantityElement = product.querySelector(".m-offer-tile__quantity");
       const image = product
         .querySelector(".a-image-responsive")
-        ?.getAttribute("srcset");
+        ?.getAttribute("data-src");
 
       const name = prodElement?.textContent
         ?.trim()
@@ -49,7 +52,7 @@ async function kaufland() {
       let price = Number.parseFloat(
         priceElement?.textContent?.trim().replace(",", ".") ?? ""
       );
-      let discountedPrice: number | null = Number.parseFloat(
+      let discountedPrice = Number.parseFloat(
         discountElement?.textContent?.trim().replace(",", ".") ?? ""
       );
       const unitOfMeasure = quantityElement?.textContent?.trim();
@@ -73,6 +76,7 @@ async function kaufland() {
 
   // products.forEach((product) => console.log(product));
   console.log(products);
+  console.log(products.length);
 
   try {
   } catch (error) {

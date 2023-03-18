@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/view/list/list_page.dart';
 import 'package:sticky_headers/sticky_headers.dart';
 
 import '../../services/user_service.dart';
@@ -44,7 +45,9 @@ class _DashBoardState extends State<DashBoard> {
                       minimumSize: const Size.fromHeight(50),
                       backgroundColor: const Color.fromRGBO(68, 153, 255, 1)
                   ),
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => const ListPage()));
+                  },
                   child: const Text("New"),
                 ),
               ),

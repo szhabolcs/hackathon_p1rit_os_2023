@@ -132,11 +132,16 @@ class _LoginPageState extends State<LoginPage> {
                                 backgroundColor: const Color.fromRGBO(68, 153, 255, 1)
                               ),
 
-                              onPressed: () {
+                              onPressed: () async {
                                 if (_formKey.currentState!.validate()) {
                                   _formKey.currentState!.save();
-                                  // ApiCalls().login(email, password);
-                                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const DashBoard()));
+                                  if (await ApiCalls().login(email, password)) {
+                                    Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const DashBoard()));
+                                  }
                                 }
                               },
                               child: const Text(

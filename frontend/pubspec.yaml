@@ -32,6 +32,7 @@ dependencies:
   http: ^0.13.5
   flutter_secure_storage: ^8.0.0
   jwt_decode: ^0.3.1
+  sticky_headers: ^0.3.0+2
   flutter:
     sdk: flutter
 

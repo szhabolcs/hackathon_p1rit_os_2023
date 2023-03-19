@@ -23,6 +23,19 @@ async function query(list: string[]) {
         result && _list.Lidl.push(result);
     }
 
+    for (const query of list) {
+        const result = await prisma.product.findFirst({
+            where: {
+                AND: [
+                    {name: { search: query }},
+                    {storeName: "Kaufland"}
+                ]
+            },
+        });
+
+        result && _list.Kaufland.push(result);
+    }
+
     return _list;
 }
 

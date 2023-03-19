@@ -21,15 +21,42 @@ async function carrefour() {}
 
 async function kaufland() {
   const page = await browser.newPage();
-  // await page.goto("https://kaufland.ro");
   await page.goto(
-    "https://www.kaufland.ro/oferte/oferte-saptamanale/saptamana-curenta.html"
+    "https://www.kaufland.ro/oferte/oferte-saptamanale/saptamana-curenta.category=01_Carne__mezeluri.html"
   );
 
+  // sometimes buggy
   await page.click(".cookie-alert-extended-button");
 
+  try {
+    const links = await page.evaluate(() => {
+      const sidemenu = document.querySelector("body > div.body__wrapper > main > div.content__separator > div > div > div.g-row.g-layout-overview > div.g-col.g-col-1");
+      const links = sidemenu?.querySelectorAll(".m-accordion__link");
+      return Array.from(links ?? []).map((link) => {
+        // Get link
+        const page = link.getAttribute("href");
+        const baseUri = "https://www.kaufland.ro" + page;
+        return baseUri;
+      });
+    });
+
+    links.forEach(async (link) => {
+      try {
+        await doOneKategory(link);
+      } catch (error) {
+        console.log(error);
+      }
+    });
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+async function doOneKategory(link: string) {
+  const page = await browser.newPage();
+  await page.goto(link);
   const products = await page.evaluate(() => {
-    const products = document.querySelectorAll(".o-slider-to-grid__tile");
+    const products = document.querySelectorAll(".m-offer-tile");
     return Array.from(products).map((product) => {
       //
       const nameElement = product.querySelector(".m-offer-tile__title");
@@ -40,25 +67,27 @@ async function kaufland() {
       const quantityElement = product.querySelector(".m-offer-tile__quantity");
       const image = product
         .querySelector(".a-image-responsive")
-        ?.getAttribute("srcset");
+        ?.getAttribute("data-src") ?? "";
 
       const name = prodElement?.textContent
-        ?.trim()
+        ?.trim() ?? ""
+        .concat(" ")
         .concat(nameElement?.textContent?.trim() ?? "");
 
       let price = Number.parseFloat(
         priceElement?.textContent?.trim().replace(",", ".") ?? ""
       );
-      let discountedPrice: number | null = Number.parseFloat(
+      let discountedPrice = Number.parseFloat(
         discountElement?.textContent?.trim().replace(",", ".") ?? ""
       );
-      const unitOfMeasure = quantityElement?.textContent?.trim();
+      const unitOfMeasure = quantityElement?.textContent?.trim() ?? "";
       const storeName = "Kaufland";
 
-      // database bug - price cannot be null
-      // if (price === null && discountedPrice !== null) {
-      //   price = discountedPrice;
-      // }
+      if (isNaN(price) && discountedPrice !== null) {
+        price = discountedPrice;
+        // @ts-ignore
+        discountedPrice = null;
+      }
 
       return {
         name,
@@ -71,18 +100,13 @@ async function kaufland() {
     });
   });
 
-  // products.forEach((product) => console.log(product));
-  console.log(products);
-
-  try {
-  } catch (error) {
-    console.log(error);
-  }
+  await prisma.product.createMany({
+    data: products as Product[],
+    skipDuplicates: true,
+  });
 }
 
 async function lidl() {
-  // Launch browser
-
   // Open page
   const page = await browser.newPage();
   await page.goto("https://lidl.ro");
@@ -109,8 +133,6 @@ async function lidl() {
         console.log(error);
       }
     });
-
-    console.log(links);
   } catch (error) {
     console.log(error);
   }
@@ -129,30 +151,29 @@ async function doOneCategory(link: string) {
         ".lidl-m-pricebox__discount-price"
       );
       const discountElement = product.querySelector(".lidl-m-pricebox__price");
-      //   const discountPercantage = product.querySelector(
-      //     ".lidl-m-pricebox__highlight"
-      //   );
+
       const quantityElement = product.querySelector(
         ".lidl-m-pricebox__basic-quantity"
       );
       const image = product
-        // .querySelector(".nuc-m-picture__image")
         .querySelector(".nuc-a-source")
-        ?.getAttribute("srcset"); // optional chaining here
+        ?.getAttribute("srcset")
+        ?.split(" ")[0]; // optional chaining here
 
       const name = nameElement?.textContent?.trim();
       let price = Number.parseFloat(
         priceElement?.textContent?.trim().replace(",", ".") ?? ""
       );
-      let discountedPrice: number | null = Number.parseFloat(
+      let discountedPrice = Number.parseFloat(
         discountElement?.textContent?.trim().replace(",", ".") ?? ""
       );
-      const unitOfMeasure = quantityElement?.textContent?.trim();
+      const unitOfMeasure = quantityElement?.textContent?.trim() ?? "";
       const storeName = "Lidl";
 
-      // database bug - price cannot be null
-      if (price === null && discountedPrice !== null) {
+      if (isNaN(price) && discountedPrice !== null) {
         price = discountedPrice;
+        // @ts-ignore
+        discountedPrice = null;
       }
 
       return {

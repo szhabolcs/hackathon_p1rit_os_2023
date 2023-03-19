@@ -1,6 +1,5 @@
 import puppeteer from "puppeteer";
 import { PrismaClient } from "@prisma/client";
-import env from "dotenv";
 import process from "process";
 const prisma = new PrismaClient();
 const browser = await puppeteer.launch({
@@ -26,7 +25,8 @@ async function kaufland() {
   );
 
   // sometimes buggy
-  // await page.click(".cookie-alert-extended-button");
+  await page.waitForSelector(".cookie-alert-extended-button");
+  await page.click(".cookie-alert-extended-button").catch();
 
   try {
     const links = await page.evaluate(() => {
@@ -42,9 +42,12 @@ async function kaufland() {
       });
     });
 
+    await page.close();
+
     links.forEach(async (link) => {
       try {
         await doOneKategory(link);
+        await new Promise(r => setTimeout(r, 2000));
       } catch (error) {
         console.log(error);
       }
@@ -57,6 +60,7 @@ async function kaufland() {
 async function doOneKategory(link: string) {
   const page = await browser.newPage();
   await page.goto(link);
+  
   const products = await page.evaluate(() => {
     const products = document.querySelectorAll(".m-offer-tile");
     return Array.from(products).map((product) => {
@@ -72,9 +76,7 @@ async function doOneKategory(link: string) {
           .querySelector(".a-image-responsive")
           ?.getAttribute("data-src") ?? "";
 
-      const name =
-        nameElement?.textContent?.trim() ??
-        "".concat(" ").concat(brandElement?.textContent?.trim() ?? "");
+      const name = `${brandElement?.textContent ?? "".replace("&amp;", "&").trim() ?? ""} ${nameElement?.textContent?.trim() ?? ""}`.trim();
 
       let price = Number.parseFloat(
         priceElement?.textContent?.trim().replace(",", ".") ?? ""
@@ -101,6 +103,10 @@ async function doOneKategory(link: string) {
       };
     });
   });
+
+  console.log(products);
+
+  await page.close();
 
   await prisma.product.createMany({
     data: products as Product[],

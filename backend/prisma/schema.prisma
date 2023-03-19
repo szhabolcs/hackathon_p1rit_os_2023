@@ -13,10 +13,11 @@ datasource db {
 }
 
 model User {
-  id       Int    @id @default(autoincrement())
-  email    String @unique
-  name     String
-  password String
+  id          Int           @id @default(autoincrement())
+  email       String        @unique
+  name        String
+  password    String
+  GroceryList GroceryList[]
 }
 
 model Product {
@@ -34,9 +35,12 @@ model Product {
 
 model GroceryList {
   id              Int               @id @default(autoincrement())
+  user            User              @relation(fields: [userId], references: [id])
+  userId          Int
   storeName       String
   sum             Float
   date            DateTime          @default(now())
+  query           String
   GroceryListLine GroceryListLine[]
 }
 
@@ -48,5 +52,5 @@ model GroceryListLine {
   product   Product @relation(fields: [productId], references: [id])
   productId Int // relation scalar field  (used in the `@relation` attribute above)
 
-  quantity      Int         @default(1)
+  quantity Int @default(1)
 }

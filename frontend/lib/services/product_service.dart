@@ -6,10 +6,12 @@ import 'package:frontend/models/product_model.dart';
 class ProductService extends ChangeNotifier {
   static late List<Map<String, List<ProductModel>>> products;
   static late Map<String, double> pricePerStore;
+  static late List<String> groceryList;
 
-  saveProducts(List<Map<String, List<ProductModel>>> prods) {
+  saveProducts(List<Map<String, List<ProductModel>>> prods, List<String> list) {
     // *saving the products
     products = prods;
+    groceryList = list;
     pricePerStore = {};
     // *iterating trough the array of stores and their products
     for (var stores in prods) {
@@ -20,17 +22,32 @@ class ProductService extends ChangeNotifier {
         }
         for (var product in value) {
           // * adding the discounted price if it has one
-          log(product.toString());
           if (product.discPrice != null) {
-            log("${pricePerStore[key]} = ${pricePerStore[key]!} + ${product.discPrice!}");
             pricePerStore[key] = pricePerStore[key]! + product.discPrice!;
           } else {
             pricePerStore[key] = pricePerStore[key]! + product.price;
           }
         }
-        log("$key ${pricePerStore[key]}");
       });
     }
     notifyListeners();
+    return true;
   }
+
+  getStoresCount() => pricePerStore.length;
+
+  getStores() => products;
+
+  getStoreNameAtIndex(int index) => pricePerStore.keys.elementAt(index);
+  getProductsByKey(String key) {
+    for (var element in products) {
+      if (element.keys.elementAt(0) == key) {
+        return element[key];
+      }
+    }
+  }
+
+  List<String> getGroceryList() => groceryList;
+
+  double getFinalPrice(String key) => pricePerStore[key] ?? 0;
 }

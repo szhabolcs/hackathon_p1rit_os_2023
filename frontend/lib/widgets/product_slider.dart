@@ -31,6 +31,8 @@ class _ProductSliderState extends State<ProductSlider> {
     super.initState();
   }
 
+  int _index = 0;
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -53,7 +55,40 @@ class _ProductSliderState extends State<ProductSlider> {
             viewportFraction: 0.93,
             enlargeFactor: 0.5,
             onPageChanged: (index, asd) {
-              productService.updatePrice(widget.product.storeName, (index == 0) ? widget.product :widget.product.others[index - 1], widget.product.id);
+              log(_index.toString() + " $index");
+              // if (_index < index) {
+              //   productService.updatePrice(
+              //       widget.product.storeName,
+              //       (index == 1) ? widget.product.others[index - 1]:widget.product ,
+              //       (index -2 < 0) ? widget.product.id :widget.product.others[index - 2].id);
+              // } else {
+              //   productService.updatePrice(
+              //       widget.product.storeName,
+              //       widget.product.others[_index],
+              //       (index == 1) ? widget.product.id : widget.product.others[index].id
+              //       // (index == 1) ? widget.product :widget.product.others[_index - 1],
+              //       // (index == 0) ? widget.product.others[0].id : widget.product.others[_index - 1].id
+              //   );
+              // }
+
+              if (_index == index - 1) {
+                productService.updatePrice(
+                    widget.product.storeName,
+                    widget.product.others[_index],
+                    (index == 1) ? widget.product.id : widget.product.others[index].id
+                );
+              } else if (_index - 1 == index) {
+                productService.updatePrice(
+                    widget.product.storeName,
+                    (index != 0) ? widget.product.others[_index] : widget.product,
+                     widget.product.others[_index].id
+                );
+              }
+
+
+              setState(() {
+                _index = index;
+              });
             },
           )
       ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/services/grocery_service.dart';
 import 'package:frontend/services/product_service.dart';
 import 'package:frontend/view/login/login.dart';
 import 'package:provider/provider.dart';
@@ -8,7 +9,10 @@ void main() {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          create: (_) => ProductService()
+          create: (_) => ProductService(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => GroceryService(),
         )
       ],
       child: const MyApp(),

@@ -1,11 +1,15 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:frontend/models/grocery_model.dart';
 import 'package:frontend/models/product_model.dart';
+import 'package:frontend/services/grocery_service.dart';
 import 'package:frontend/services/product_service.dart';
 import 'package:frontend/widgets/product_card.dart';
 import 'package:frontend/widgets/product_slider.dart';
 import 'package:provider/provider.dart';
+
+import '../utils/api_calls.dart';
 
 class StoreCard extends StatefulWidget {
   const StoreCard({
@@ -24,10 +28,12 @@ class StoreCard extends StatefulWidget {
 class _StoreCardState extends State<StoreCard> {
 
   late ProductService productService = ProductService();
+  late GroceryService groceryService = GroceryService();
 
   @override
   void initState() {
     productService = Provider.of<ProductService>(context, listen: false);
+    groceryService = Provider.of<GroceryService>(context, listen: false);
     super.initState();
   }
 
@@ -128,7 +134,33 @@ class _StoreCardState extends State<StoreCard> {
                     child: ProductCard(product: widget.products[index]),
                   );
           }
-        )
+        ),
+        const SizedBox(height: 30,),
+        ElevatedButton(
+            style: ElevatedButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                minimumSize: const Size.fromHeight(50),
+                backgroundColor: const Color.fromRGBO(68, 153, 255, 1)
+            ),
+
+            onPressed: () async {
+              if (await ApiCalls().saveGroceryLists(widget.products) == "OK") {
+                groceryService.updateGroceries();
+                Navigator.pop(context);
+                Navigator.pop(context);
+              }
+            },
+            child: const Text(
+              "Save",
+              style: TextStyle(
+                  fontSize: 16
+              ),
+            )
+        ),
+        const SizedBox(height: 30,),
+
       ],
     );
   }

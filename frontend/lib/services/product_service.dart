@@ -7,6 +7,7 @@ class ProductService extends ChangeNotifier {
   static late List<Map<String, List<ProductModel>>> products;
   static late Map<String, double> pricePerStore;
   static late List<String> groceryList;
+  static late int currentIndex = 0;
 
   saveProducts(List<Map<String, List<ProductModel>>> prods, List<String> list) {
     // *saving the products
@@ -52,28 +53,39 @@ class ProductService extends ChangeNotifier {
   double getFinalPrice(String key) => pricePerStore[key] ?? 0;
 
   updatePrice(String key, ProductModel newProduct, int oldProductID) {
-    log(key);
+    // log(newProduct.toString());
+    // log(oldProductID.toString());
     for (var element in products) {
       if (element.keys.first == key) {
         // log(element.toString());
         if (element[key] == null) continue;
         for (var element in element[key]!) {
           if (element.id == oldProductID) {
-            // log("${pricePerStore[key]} = ${pricePerStore[key]!} + ${newProduct.price}");
-            if (newProduct.discPrice != null) {
-              pricePerStore[key] = pricePerStore[key]! + newProduct.discPrice!;
-              pricePerStore[key] = pricePerStore[key]! - element.discPrice!;
-            } else {
-              pricePerStore[key] = pricePerStore[key]! + newProduct.price;
-              pricePerStore[key] = pricePerStore[key]! - element.price;
-            }
+            pricePerStore[key] = element.discPrice != null ? pricePerStore[key]! - element.discPrice!
+                                  : pricePerStore[key]! - element.price;
+            pricePerStore[key] = newProduct.discPrice != null ? pricePerStore[key]! + newProduct.discPrice!
+                : pricePerStore[key]! + newProduct.price;
 
             // log("${pricePerStore[key]} = ${pricePerStore[key]!} - ${element.price}");
-            pricePerStore[key] = pricePerStore[key]! - element.price;
+            // pricePerStore[key] = pricePerStore[key]! - element.price;
+          } else {
+            if (element.others.length == 0) continue;
+
+            element.others.forEach((element) {
+              if (element.id == oldProductID) {
+
+              }
+            });
           }
         }
       }
     }
     notifyListeners();
   }
+
+  setIndex(int index) {
+    currentIndex = index;
+  }
+
+  getIndex() => currentIndex;
 }

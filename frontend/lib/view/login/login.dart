@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:frontend/utils/api_calls.dart';
 import 'package:frontend/view/register/register.dart';
@@ -135,19 +137,9 @@ class _LoginPageState extends State<LoginPage> {
                               onPressed: () async {
                                 if (_formKey.currentState!.validate()) {
                                   _formKey.currentState!.save();
-                                  if (await ApiCalls().login(email, password)) {
-                                    Navigator.pushReplacement(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                const DashBoard()));
-                                  }
+                                  if (await ApiCalls().login(email, password))
+                                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const DashBoard()));
                                 }
-                                Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                        const DashBoard()));
                               },
                               child: const Text(
                                 "Login",

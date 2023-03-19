@@ -14,3 +14,6 @@ list.use(cors({
 
 
 list.post("/query", ListController.query);
+list.post("/save", ListController.save);
+list.get("/:id", ListController.retrieve);
+list.get("/:id/meta", ListController.retrieveMeta);

@@ -41,22 +41,37 @@ class _ListPageState extends State<ListPage> {
               final resp = await ApiCalls().search(list);
 
               final Map<String, dynamic> data = json.decode(resp);
-              log(data.toString());
               final List<Map<String, List<ProductModel>>> products = [];
 
               data.forEach((key, value) {
                 products.add({key: []});
                 for (var element in (value as List)) {
+                  List<ProductModel> prods = [];
+                  for (var prod in (element['others'] as List<dynamic>)) {
+                    final ProductModel productModel = ProductModel(
+                        prod['id'],
+                        prod['name'],
+                        prod['price'].toDouble(),
+                        prod['discountedPrice'],
+                        prod['unitOfMeasure'],
+                        prod['image'],
+                        prod['storeName'],
+                        []);
+                    prods.add(productModel);
+                  }
                   final ProductModel productModel = ProductModel(
                       element['id'],
                       element['name'],
-                      element['price'],
+                      element['price'].toDouble(),
                       element['discountedPrice'],
                       element['unitOfMeasure'],
                       element['image'],
-                      element['storeName']);
+                      element['storeName'],
+                      prods);
                   products.last[key]!.add(productModel);
                 }
+
+
               });
 
               if (ProductService().saveProducts(products, list)) {

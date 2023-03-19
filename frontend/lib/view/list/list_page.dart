@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/models/product_model.dart';
 import 'package:frontend/services/product_service.dart';
 import 'package:frontend/utils/api_calls.dart';
+import 'package:frontend/view/product/product_page.dart';
 
 class ListPage extends StatefulWidget {
   const ListPage({Key? key}) : super(key: key);
@@ -58,8 +59,10 @@ class _ListPageState extends State<ListPage> {
                 }
               });
 
+              if (ProductService().saveProducts(products, list)) {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => const ProductPage()));
+              }
 
-              ProductService().saveProducts(products);
             }
           },
         ),

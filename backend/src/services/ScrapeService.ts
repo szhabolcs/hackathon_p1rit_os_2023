@@ -1,6 +1,5 @@
 import puppeteer from "puppeteer";
 import { PrismaClient } from "@prisma/client";
-import env from "dotenv";
 import process from "process";
 const prisma = new PrismaClient();
 const browser = await puppeteer.launch({
@@ -26,11 +25,14 @@ async function kaufland() {
   );
 
   // sometimes buggy
-  await page.click(".cookie-alert-extended-button");
+  await page.waitForSelector(".cookie-alert-extended-button");
+  await page.click(".cookie-alert-extended-button").catch();
 
   try {
     const links = await page.evaluate(() => {
-      const sidemenu = document.querySelector("body > div.body__wrapper > main > div.content__separator > div > div > div.g-row.g-layout-overview > div.g-col.g-col-1");
+      const sidemenu = document.querySelector(
+        "body > div.body__wrapper > main > div.content__separator > div > div > div.g-row.g-layout-overview > div.g-col.g-col-1"
+      );
       const links = sidemenu?.querySelectorAll(".m-accordion__link");
       return Array.from(links ?? []).map((link) => {
         // Get link
@@ -40,9 +42,12 @@ async function kaufland() {
       });
     });
 
+    await page.close();
+
     links.forEach(async (link) => {
       try {
         await doOneKategory(link);
+        await new Promise(r => setTimeout(r, 2000));
       } catch (error) {
         console.log(error);
       }
@@ -55,24 +60,23 @@ async function kaufland() {
 async function doOneKategory(link: string) {
   const page = await browser.newPage();
   await page.goto(link);
+  
   const products = await page.evaluate(() => {
     const products = document.querySelectorAll(".m-offer-tile");
     return Array.from(products).map((product) => {
       //
       const nameElement = product.querySelector(".m-offer-tile__title");
-      const prodElement = product.querySelector(".m-offer-tile__subtitle");
+      const brandElement = product.querySelector(".m-offer-tile__subtitle");
 
       const discountElement = product.querySelector(".a-pricetag__price");
       const priceElement = product.querySelector(".a-pricetag__old-price");
       const quantityElement = product.querySelector(".m-offer-tile__quantity");
-      const image = product
-        .querySelector(".a-image-responsive")
-        ?.getAttribute("data-src") ?? "";
+      const image =
+        product
+          .querySelector(".a-image-responsive")
+          ?.getAttribute("data-src") ?? "";
 
-      const name = prodElement?.textContent
-        ?.trim() ?? ""
-        .concat(" ")
-        .concat(nameElement?.textContent?.trim() ?? "");
+      const name = `${brandElement?.textContent ?? "".replace("&amp;", "&").trim() ?? ""} ${nameElement?.textContent?.trim() ?? ""}`.trim();
 
       let price = Number.parseFloat(
         priceElement?.textContent?.trim().replace(",", ".") ?? ""
@@ -99,6 +103,10 @@ async function doOneKategory(link: string) {
       };
     });
   });
+
+  console.log(products);
+
+  await page.close();
 
   await prisma.product.createMany({
     data: products as Product[],

@@ -5,6 +5,8 @@
 
 export { };
 
+import { Product as P } from "@prisma/client";
+
 declare global {
     interface RegisterUser {
         name: string,
@@ -28,6 +30,10 @@ declare global {
         unitOfMeasure: string,
         storeName: string,
         image: string
+    }
+
+    interface ProductWithOthers extends P {
+        others: P[]
     }
 
     const enum ResponseCode {

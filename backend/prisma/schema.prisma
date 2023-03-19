@@ -3,7 +3,7 @@
 // Types found here: https://www.prisma.io/docs/concepts/database-connectors/mysql
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["fullTextSearch", "fullTextIndex"]
 }
 
@@ -13,20 +13,44 @@ datasource db {
 }
 
 model User {
-  id       Int    @id @default(autoincrement())
-  email    String @unique
-  name     String
-  password String
+  id          Int           @id @default(autoincrement())
+  email       String        @unique
+  name        String
+  password    String
+  GroceryList GroceryList[]
 }
 
 model Product {
-  id              Int    @id @default(autoincrement())
+  id              Int               @id @default(autoincrement())
   name            String
   price           Float
   discountedPrice Float?
   unitOfMeasure   String
   image           String
   storeName       String
+  GroceryListLine GroceryListLine[]
 
   @@fulltext([name])
+}
+
+model GroceryList {
+  id              Int               @id @default(autoincrement())
+  user            User              @relation(fields: [userId], references: [id])
+  userId          Int
+  storeName       String
+  sum             Float
+  date            DateTime          @default(now())
+  query           String
+  GroceryListLine GroceryListLine[]
+}
+
+model GroceryListLine {
+  id            Int         @id @default(autoincrement())
+  groceryList   GroceryList @relation(fields: [groceryListId], references: [id])
+  groceryListId Int // relation scalar field  (used in the `@relation` attribute above)
+
+  product   Product @relation(fields: [productId], references: [id])
+  productId Int // relation scalar field  (used in the `@relation` attribute above)
+
+  quantity Int @default(1)
 }

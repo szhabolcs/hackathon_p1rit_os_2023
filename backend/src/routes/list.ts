@@ -19,5 +19,6 @@ list.post("/query", ListController.query);
 
 // Todo : implement the controller functions and services
 list.post("/save", authorizeJWT, ListController.save);
-list.get("/:id", ListController.retrieve);
-list.get("/:id/meta", ListController.retrieveMeta);
+list.get("/meta", authorizeJWT, ListController.retrieveAllMeta);
+list.get("/:id", authorizeJWT, ListController.retrieve);
+list.get("/:id/meta", authorizeJWT, ListController.retrieveMeta);

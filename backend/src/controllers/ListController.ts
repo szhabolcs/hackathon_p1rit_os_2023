@@ -64,9 +64,22 @@ async function retrieve(req: Request, res: Response) {
   }
 }
 
+async function retrieveAllMeta(req: Request, res: Response) {
+  const id = req.user.id;
+  
+  try {
+    const list = await ListService.retrieveAllMeta(id);
+    res.status(ResponseCode.Ok).json(list);
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(ResponseCode.BadRequest);
+  }
+}
+
 export default {
   query,
   save,
   retrieveMeta,
-  retrieve
+  retrieve,
+  retrieveAllMeta
 };

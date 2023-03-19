@@ -3,7 +3,7 @@
 // Types found here: https://www.prisma.io/docs/concepts/database-connectors/mysql
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["fullTextSearch", "fullTextIndex"]
 }
 
@@ -30,3 +30,24 @@ model Product {
 
   @@fulltext([name])
 }
+
+// model GroceryList {
+//   id        Int               @id @default(autoincrement())
+//   storeName String
+//   sum       Float
+//   date      DateTime          @default(now())
+//   lines     GroceryListLine[]
+
+//   @@map("grocery_lists")
+// }
+
+// model GroceryListLine {
+//   id            Int         @id @default(autoincrement())
+//   // product       Product     @relation(fields: [productId], references: [id])
+//   productId     Int
+//   quantity      Int         @default(1)
+//   groceryList   GroceryList @relation(fields: [groceryListId], references: [id])
+//   groceryListId Int
+
+//   @@unique([groceryListId, productId])
+// }

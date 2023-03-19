@@ -55,10 +55,9 @@ async function retrieve(req: Request, res: Response) {
   const id = Number.parseInt(req.params.id);
 
   try {
-    //TODO: [ASK] what form of retrieved data do we want?
     const list = await ListService.retrieve(id);
-
-    res.status(ResponseCode.Ok).json(list);
+    const ret = list.map(el => el.product);
+    res.status(ResponseCode.Ok).json(ret);
   } catch (error) {
     console.log(error);
     res.sendStatus(ResponseCode.BadRequest);

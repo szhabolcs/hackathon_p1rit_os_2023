@@ -1,39 +1,59 @@
-import { PrismaClient, Product } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 async function query(list: string[]) {
     const _list: {
-        Lidl: Product[];
-        Kaufland: Product[];
+        Lidl: ProductWithOthers[];
+        Kaufland: ProductWithOthers[];
     } = {
         "Lidl": [],
         "Kaufland": []
     };
 
-    for (const query of list) {
-        const result = await prisma.product.findFirst({
-            where: {
-                AND: [
-                    {name: { search: query }},
-                    {storeName: "Lidl"}
-                ]
-            },
-        });
+    _list.Lidl = await getListFromStore(list, "Lidl");
+    _list.Kaufland = await getListFromStore(list, "Kaufland");
 
-        result && _list.Lidl.push(result);
-    }
+    return _list;
+}
+
+async function getListFromStore(list: string[], store: "Lidl" | "Kaufland") {
+    const _list: ProductWithOthers[] = [];
 
     for (const query of list) {
         const result = await prisma.product.findFirst({
             where: {
                 AND: [
                     {name: { search: query }},
-                    {storeName: "Kaufland"}
+                    {storeName: store}
+                ]
+            },
+        });
+        if (result === null)
+            continue;
+
+        const others = await prisma.product.findMany({
+            where: {
+                AND: [
+                    {name: { search: query }},
+                    {storeName: store},
+                    {id: {not: result.id}},
+                    {image: {not: result.image}}
                 ]
             },
         });
 
-        result && _list.Kaufland.push(result);
+        const line = {
+            id: result.id,
+            name: result.name,
+            price: result.price,
+            discountedPrice: result.discountedPrice,
+            unitOfMeasure: result.unitOfMeasure,
+            image: result.image,
+            storeName: result.storeName,
+            others
+        };
+
+        result && _list.push(line);
     }
 
     return _list;

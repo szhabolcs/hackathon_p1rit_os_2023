@@ -26,11 +26,13 @@ async function kaufland() {
   );
 
   // sometimes buggy
-  await page.click(".cookie-alert-extended-button");
+  // await page.click(".cookie-alert-extended-button");
 
   try {
     const links = await page.evaluate(() => {
-      const sidemenu = document.querySelector("body > div.body__wrapper > main > div.content__separator > div > div > div.g-row.g-layout-overview > div.g-col.g-col-1");
+      const sidemenu = document.querySelector(
+        "body > div.body__wrapper > main > div.content__separator > div > div > div.g-row.g-layout-overview > div.g-col.g-col-1"
+      );
       const links = sidemenu?.querySelectorAll(".m-accordion__link");
       return Array.from(links ?? []).map((link) => {
         // Get link
@@ -60,19 +62,19 @@ async function doOneKategory(link: string) {
     return Array.from(products).map((product) => {
       //
       const nameElement = product.querySelector(".m-offer-tile__title");
-      const prodElement = product.querySelector(".m-offer-tile__subtitle");
+      const brandElement = product.querySelector(".m-offer-tile__subtitle");
 
       const discountElement = product.querySelector(".a-pricetag__price");
       const priceElement = product.querySelector(".a-pricetag__old-price");
       const quantityElement = product.querySelector(".m-offer-tile__quantity");
-      const image = product
-        .querySelector(".a-image-responsive")
-        ?.getAttribute("data-src") ?? "";
+      const image =
+        product
+          .querySelector(".a-image-responsive")
+          ?.getAttribute("data-src") ?? "";
 
-      const name = prodElement?.textContent
-        ?.trim() ?? ""
-        .concat(" ")
-        .concat(nameElement?.textContent?.trim() ?? "");
+      const name =
+        nameElement?.textContent?.trim() ??
+        "".concat(" ").concat(brandElement?.textContent?.trim() ?? "");
 
       let price = Number.parseFloat(
         priceElement?.textContent?.trim().replace(",", ".") ?? ""

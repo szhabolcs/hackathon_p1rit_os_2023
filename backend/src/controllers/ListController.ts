@@ -22,12 +22,8 @@ async function save(req: Request, res: Response) {
   const storeName: string = req.body.store;
   const tokenUser = req.user.id;
 
-  // console.log(JSON.stringify(products));
-  // console.log(JSON.stringify(query));
-  // console.log(JSON.stringify(sum));
-  // console.log(JSON.stringify(storeName));
   try {
-    const _save = await ListService.save(
+    await ListService.save(
       tokenUser,
       products,
       query,
@@ -35,7 +31,34 @@ async function save(req: Request, res: Response) {
       storeName
     );
 
-    res.status(ResponseCode.Ok).json(products);
+    res.sendStatus(ResponseCode.Ok);
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(ResponseCode.BadRequest);
+  }
+}
+
+async function retrieveMeta(req: Request, res: Response) {
+  const id = Number.parseInt(req.params.id);
+
+  try {
+    const list = await ListService.retrieveMeta(id);
+
+    res.status(ResponseCode.Ok).json(list);
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(ResponseCode.BadRequest);
+  }
+}
+
+async function retrieve(req: Request, res: Response) {
+  const id = Number.parseInt(req.params.id);
+
+  try {
+    //TODO: [ASK] what form of retrieved data do we want?
+    const list = await ListService.retrieve(id);
+
+    res.status(ResponseCode.Ok).json(list);
   } catch (error) {
     console.log(error);
     res.sendStatus(ResponseCode.BadRequest);
@@ -45,4 +68,6 @@ async function save(req: Request, res: Response) {
 export default {
   query,
   save,
+  retrieveMeta,
+  retrieve
 };

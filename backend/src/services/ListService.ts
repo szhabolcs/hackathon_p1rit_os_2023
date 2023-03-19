@@ -92,7 +92,28 @@ async function save(
   });
 }
 
+async function retrieveMeta(id: number) {
+  return await prisma.groceryList.findFirstOrThrow({
+    where: {
+      id
+    },
+  });
+}
+
+async function retrieve(id: number) {
+  return await prisma.groceryListLine.findMany({
+    where: {
+      groceryListId: id
+    },
+    include: {
+      product: {}
+    }
+  });
+}
+
 export default {
   query,
   save,
+  retrieveMeta,
+  retrieve
 };

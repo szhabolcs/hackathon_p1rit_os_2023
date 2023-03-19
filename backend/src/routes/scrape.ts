@@ -1,7 +1,12 @@
 import express from "express";
 import cors from "cors";
 
-import { carrefour, kaufland, lidl } from "../controllers/ScrapeController.js";
+import {
+  auchan,
+  carrefour,
+  kaufland,
+  lidl,
+} from "../controllers/ScrapeController.js";
 
 export const scrape = express.Router();
 scrape.use(
@@ -17,3 +22,4 @@ scrape.use(
 scrape.post("/carrefour", carrefour);
 scrape.post("/kaufland", kaufland);
 scrape.post("/lidl", lidl);
+scrape.post("/auchan", auchan);

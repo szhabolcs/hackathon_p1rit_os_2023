@@ -31,4 +31,14 @@ async function lidl(req: Request, res: Response) {
   }
 }
 
-export { carrefour, kaufland, lidl };
+async function auchan(req: Request, res: Response) {
+  try {
+    await ScrapeService.auchan();
+    res.sendStatus(ResponseCode.Ok);
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(ResponseCode.BadRequest);
+  }
+}
+
+export { auchan, carrefour, kaufland, lidl };

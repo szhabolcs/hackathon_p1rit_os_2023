@@ -23,10 +23,11 @@ async function getListFromStore(list: string[], store: "Lidl" | "Kaufland") {
         const result = await prisma.product.findFirst({
             where: {
                 AND: [
-                    {name: { search: query }},
-                    {storeName: store}
+                    { name: { search: query } },
+                    { storeName: store }
                 ]
             },
+            orderBy: [{discountedPrice: "asc"}, { price: "asc" }]
         });
         if (result === null)
             continue;
@@ -34,12 +35,13 @@ async function getListFromStore(list: string[], store: "Lidl" | "Kaufland") {
         const others = await prisma.product.findMany({
             where: {
                 AND: [
-                    {name: { search: query }},
-                    {storeName: store},
-                    {id: {not: result.id}},
-                    {image: {not: result.image}}
+                    { name: { search: query } },
+                    { storeName: store },
+                    { id: { not: result.id } },
+                    { image: { not: result.image } }
                 ]
             },
+            orderBy: [{discountedPrice: "asc"}, { price: "asc" }]
         });
 
         const line = {

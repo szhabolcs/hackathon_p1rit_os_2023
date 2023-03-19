@@ -50,4 +50,30 @@ class ProductService extends ChangeNotifier {
   List<String> getGroceryList() => groceryList;
 
   double getFinalPrice(String key) => pricePerStore[key] ?? 0;
+
+  updatePrice(String key, ProductModel newProduct, int oldProductID) {
+    log(key);
+    for (var element in products) {
+      if (element.keys.first == key) {
+        // log(element.toString());
+        if (element[key] == null) continue;
+        for (var element in element[key]!) {
+          if (element.id == oldProductID) {
+            // log("${pricePerStore[key]} = ${pricePerStore[key]!} + ${newProduct.price}");
+            if (newProduct.discPrice != null) {
+              pricePerStore[key] = pricePerStore[key]! + newProduct.discPrice!;
+              pricePerStore[key] = pricePerStore[key]! - element.discPrice!;
+            } else {
+              pricePerStore[key] = pricePerStore[key]! + newProduct.price;
+              pricePerStore[key] = pricePerStore[key]! - element.price;
+            }
+
+            // log("${pricePerStore[key]} = ${pricePerStore[key]!} - ${element.price}");
+            pricePerStore[key] = pricePerStore[key]! - element.price;
+          }
+        }
+      }
+    }
+    notifyListeners();
+  }
 }

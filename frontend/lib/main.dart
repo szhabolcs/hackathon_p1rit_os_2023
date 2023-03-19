@@ -1,8 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/services/product_service.dart';
 import 'package:frontend/view/login/login.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) => ProductService()
+        )
+      ],
+      child: const MyApp(),
+    )
+  );
 }
 
 class MyApp extends StatelessWidget {

@@ -143,6 +143,11 @@ class _LoginPageState extends State<LoginPage> {
                                                 const DashBoard()));
                                   }
                                 }
+                                Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                        const DashBoard()));
                               },
                               child: const Text(
                                 "Login",

@@ -1,10 +1,13 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:frontend/models/product_model.dart';
 import 'package:frontend/services/product_service.dart';
-import 'package:frontend/services/user_service.dart';
 import 'package:frontend/widgets/product_card.dart';
+import 'package:frontend/widgets/product_slider.dart';
+import 'package:provider/provider.dart';
 
-class StoreCard extends StatelessWidget {
+class StoreCard extends StatefulWidget {
   const StoreCard({
     Key? key,
     required this.storeName,
@@ -15,13 +18,27 @@ class StoreCard extends StatelessWidget {
   final List<ProductModel> products;
 
   @override
+  State<StoreCard> createState() => _StoreCardState();
+}
+
+class _StoreCardState extends State<StoreCard> {
+
+  late ProductService productService = ProductService();
+
+  @override
+  void initState() {
+    productService = Provider.of<ProductService>(context, listen: false);
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         Row(
           children: [
             Text(
-              storeName,
+              widget.storeName,
               textAlign: TextAlign.center,
               style: const TextStyle(
                   fontSize: 26,
@@ -56,34 +73,38 @@ class StoreCard extends StatelessWidget {
               ),
             ),
             const Spacer(),
-            Text(
-              "${ProductService().getFinalPrice(storeName).toStringAsFixed(2)} RON",
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-                color: Color.fromRGBO(68, 153, 255, 1)
-              ),
+            Consumer<ProductService> (
+              builder: (context, data, child) {
+                return Text(
+                  "${ProductService().getFinalPrice(widget.storeName).toStringAsFixed(2)} RON",
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: Color.fromRGBO(68, 153, 255, 1)
+                  ),
+                );
+              }
             ),
             const Spacer(),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 1),
               decoration: BoxDecoration(
                   border: Border.all(
-                    color: (products.length - ProductService().getGroceryList().length == 0)
+                    color: (widget.products.length - ProductService().getGroceryList().length == 0)
                         ? Colors.green
-                        : (products.isEmpty)
+                        : (widget.products.isEmpty)
                         ? Colors.red
-                        : Colors.yellow,
+                        : Colors.orange,
                   ),
-                  color: (products.length - ProductService().getGroceryList().length == 0)
+                  color: (widget.products.length - ProductService().getGroceryList().length == 0)
                       ? Colors.green
-                      : (products.isEmpty)
+                      : (widget.products.isEmpty)
                       ? Colors.red
-                      : Colors.yellow,
+                      : Colors.orange,
                   borderRadius: const BorderRadius.all(Radius.circular(20))
               ),
               child: Text(
-                "${products.length}/${ProductService().getGroceryList().length}",
+                "${widget.products.length}/${ProductService().getGroceryList().length}",
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -98,9 +119,14 @@ class StoreCard extends StatelessWidget {
         ListView.builder (
           physics: const NeverScrollableScrollPhysics(),
           shrinkWrap: true,
-          itemCount: products.length,
+          itemCount: widget.products.length,
           itemBuilder: (context, index) {
-            return ProductCard(product: products[index]);
+            return (widget.products[index].others.isNotEmpty)
+                ? ProductSlider(product: widget.products[index])
+                : Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 13),
+                    child: ProductCard(product: widget.products[index]),
+                  );
           }
         )
       ],

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import 'package:frontend/utils/api_calls.dart';
+
+import '../dashboard/dashboard.dart';
 class RegisterPage extends StatefulWidget {
   const RegisterPage({Key? key}) : super(key: key);
 
@@ -157,9 +160,11 @@ class _RegisterPageState extends State<RegisterPage> {
                                 minimumSize: const Size.fromHeight(50),
                               ),
 
-                              onPressed: () {
+                              onPressed: () async {
                                 if (_formKey.currentState!.validate()) {
                                   _formKey.currentState!.save();
+                                  if (await ApiCalls().register(username,email, password))
+                                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const DashBoard()));
                                 }
                               },
                               child: const Text(

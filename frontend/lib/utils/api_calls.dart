@@ -70,6 +70,28 @@ class ApiCalls {
     }
   }
 
+  register(String name, String email, String password) async {
+    Map<String, String> body = {
+      "name": name,
+      "email": email,
+      "password": password
+    };
+    final resp = await post("/auth/register", null, json.encode(body));
+    log(resp.toString());
+    if (json.decode(resp.body)['token'] != null) {
+
+      storage.write(key: "token", value: json.decode(resp.body)['token']);
+      storage.write(key: "refresh", value: json.decode(resp.body)['refresh']);
+      final userData = Jwt.parseJwt(json.decode(resp.body)['token']);
+      final UserModel user = UserModel(userData['user']['id'], name, email);
+      UserService().storeUser(user);
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+
   search(List<String> list) async {
     Map<String, List<String>> body = {
       "list": list

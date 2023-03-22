@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/models/grocery_model.dart';
+import 'package:frontend/widgets/grocery_bottom_modal.dart';
 
 class GroceryCard extends StatelessWidget {
   const GroceryCard({
@@ -14,10 +15,16 @@ class GroceryCard extends StatelessWidget {
     return InkWell(
       onTap: () {
         showModalBottomSheet(
-            context: context,
-            builder: (context) {
-              return Container();
-            }
+          elevation: .2,
+          context: context,
+          builder: (context) {
+            return Container(
+              child: GroceryBottomModal(
+                groceryId: grocery.id,
+                total: grocery.sum,
+              ),
+            );
+          }
         );
       },
       child: Column(

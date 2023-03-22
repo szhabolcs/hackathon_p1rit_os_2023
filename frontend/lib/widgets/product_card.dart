@@ -1,3 +1,5 @@
+import 'dart:developer';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/models/product_model.dart';
 
@@ -23,10 +25,14 @@ class ProductCard extends StatelessWidget {
           physics: const NeverScrollableScrollPhysics(),
           child: Row(
             children: [
-              Image.network(
-                product.image,
+              SizedBox(
                 height: 80,
                 width: 80,
+                child: CachedNetworkImage(
+                  imageUrl: product.image,
+                  placeholder: (context, url) => new CircularProgressIndicator(),
+                  errorWidget: (context, url, error) => new Image.asset('assets/placeholders/img-placeholder.png'),
+                ),
               ),
               Expanded(
                 child: Column(

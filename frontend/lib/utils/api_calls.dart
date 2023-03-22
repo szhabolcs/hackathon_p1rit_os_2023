@@ -56,7 +56,6 @@ class ApiCalls {
       "password": password
     };
     final resp = await post("/auth/login", null, json.encode(body));
-    log(resp.toString());
     if (json.decode(resp.body)['token'] != null) {
 
       storage.write(key: "token", value: json.decode(resp.body)['token']);
@@ -77,7 +76,6 @@ class ApiCalls {
       "password": password
     };
     final resp = await post("/auth/register", null, json.encode(body));
-    log(resp.toString());
     if (json.decode(resp.body)['token'] != null) {
 
       storage.write(key: "token", value: json.decode(resp.body)['token']);
@@ -133,6 +131,14 @@ class ApiCalls {
     final token = await storage.read(key: "token");
 
     final resp = await post('/list/save', token, json.encode(body));
+
+    return resp.body;
+  }
+
+  getSavedGroceryListById(int id) async{
+
+    final token = await storage.read(key: "token");
+    final resp = await get('/list/${id}', token);
 
     return resp.body;
   }

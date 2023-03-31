@@ -41,7 +41,7 @@ class ProductCard extends StatelessWidget {
                     Row(
                       children: [
                         SizedBox(
-                          width: 150,
+                          width: 130,
                           child: Text(
                             product.name,
                             overflow: TextOverflow.ellipsis,
